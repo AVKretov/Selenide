@@ -25,7 +25,7 @@ class Tests {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
         //Вставляем завтрашнее число в дату встречи
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(1).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
@@ -37,7 +37,7 @@ class Tests {
     @Test
     void emptyCity() {
 
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(1).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
@@ -62,7 +62,7 @@ class Tests {
     void emptyName() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(1).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
@@ -73,7 +73,7 @@ class Tests {
     void emptyPhone() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(1).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
