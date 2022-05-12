@@ -1,6 +1,7 @@
 package ru.netology;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +25,19 @@ class Tests {
     void happyPath() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        //Вставляем завтрашнее число в дату встречи
+
+        //Вставляем число через 3 дня в дату встречи
         $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
-        $x("//*[text()='Успешно!']").shouldBe(visible, Duration.ofSeconds(15));
+        // форматируем нужную нам дату из формата dd-mm-yyyy в формат dd.mm.yyyy
+        String europeanDatePattern = "dd.MM.yyyy";
+        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
+        String myDate = europeanDateFormatter.format(LocalDate.now().plusDays(3)).toString();
+        // Ждем появления текста с нашей датой.
+        $x(String.format("//*[text()='%s']", myDate)).shouldBe(visible, Duration.ofSeconds(15));
         //$x("//*[@data-test-id='notification']").shouldBe(visible, Duration.ofSeconds(15));
 
     }
@@ -84,7 +91,7 @@ class Tests {
     void emptyAgreementCheckBox() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(1).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//span[text()='Забронировать']").click();
@@ -96,8 +103,11 @@ class Tests {
 
         //Ввод 2 букв в поле город, после чего выбор нужного города из выпадающего списка:
 
-        $x("//input[@placeholder='Город']").setValue("Мо").sendKeys(Keys.ARROW_DOWN,
-                Keys.ARROW_DOWN,Keys.ARROW_DOWN,Keys.ENTER);
+//        $x("//input[@placeholder='Город']").setValue("Мо").sendKeys(Keys.ARROW_DOWN,
+//                Keys.ARROW_DOWN,Keys.ARROW_DOWN,Keys.ENTER);
+
+        $x("//input[@placeholder='Город']").setValue("Мо");
+        $x("//*[text()= 'Москва']").click();
 
 
         //Выбор даты на неделю вперёд (начиная от текущей даты) через инструмент календаря:
@@ -105,19 +115,29 @@ class Tests {
         //Открытие календаря
         $x("//input[@placeholder='Дата встречи']//following-sibling::span").click();
         //создаем переменную с датой доставки.
-        int dayOfDelivery = LocalDate.now().plusDays(7).getDayOfMonth();
-        //если через 7 дней будет все тот же месяц , что и сегодня то if
+        int dayOfDelivery = LocalDate.now().plusDays(7).getDayOfMonth(); //получаем число месяца в формате dd
+        //если число месяца через 7 дней будет больше 7 , значит через 7 дней будет тот же месяц, что и сейчас > if
         if (dayOfDelivery > 7) {
-            System.out.print(String.format("//*[text()='%s']", dayOfDelivery));
+            //System.out.print(String.format("//*[text()='%s']", dayOfDelivery));
             $x(String.format("//*[text()='%s']", dayOfDelivery)).doubleClick();
         }
         //Если нет.
         else {
-            $x("//*[@data-step='1']").click();
-            $x(String.format("//*[text()='%s']", dayOfDelivery)).doubleClick();
+            $x("//*[@data-step='1']").click(); //Переходим на след. месяц кнопкой стрелка вправо
+            $x(String.format("//*[text()='%s']", dayOfDelivery)).doubleClick(); //ищем наше число
         }
 
+        $x("//input[@name='name']").setValue("Иванов Иван");
+        $x("//input[@name='phone']").setValue("+79112345678");
+        $x("//*[@data-test-id='agreement']").click();
+        $x("//span[text()='Забронировать']").click();
+        $x("//span[text()='Забронировать']").click();
+        // форматируем нужную нам дату из формата dd-mm-yyyy в формат dd.mm.yyyy
+        String europeanDatePattern = "dd.MM.yyyy";
+        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
+        String myDate = europeanDateFormatter.format(LocalDate.now().plusDays(7)).toString();
 
+        $x(String.format("//*[text()='%s']", myDate)).shouldBe(visible, Duration.ofSeconds(15));
 
     }
 
