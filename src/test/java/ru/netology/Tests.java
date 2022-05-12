@@ -115,7 +115,7 @@ class Tests {
         //Открытие календаря
         $x("//input[@placeholder='Дата встречи']//following-sibling::span").click();
         //создаем переменную с датой доставки.
-        int dayOfDelivery = LocalDate.now().plusDays(7).getDayOfMonth(); //получаем число месяца в формате dd
+        int dayOfDelivery = LocalDate.now().plusDays(7).getDayOfMonth(); //получаем число доставки в формате dd
         //если число месяца через 7 дней будет больше 7 , значит через 7 дней будет тот же месяц, что и сейчас > if
         if (dayOfDelivery > 7) {
             //System.out.print(String.format("//*[text()='%s']", dayOfDelivery));
