@@ -14,6 +14,11 @@ import static com.codeborne.selenide.Selenide.*;
 
 class Tests {
 
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
+
 
     @BeforeEach
     void setUp() {
@@ -27,18 +32,16 @@ class Tests {
         $x("//input[@placeholder='Город']").setValue("Москва");
 
         //Вставляем число через 3 дня в дату встречи
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(3));
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
-        // форматируем нужную нам дату из формата dd-mm-yyyy в формат dd.mm.yyyy
-        String europeanDatePattern = "dd.MM.yyyy";
-        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
-        String myDate = europeanDateFormatter.format(LocalDate.now().plusDays(3)).toString();
+
         // Ждем появления текста с нашей датой.
-        $x(String.format("//*[text()='%s']", myDate)).shouldBe(visible, Duration.ofSeconds(15));
-        //$x("//*[@data-test-id='notification']").shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification'] .notification__content").shouldBe(visible, Duration.ofSeconds(15))
+                .shouldHave(text(generateDate(3)));
+
 
     }
     @Test
@@ -118,26 +121,22 @@ class Tests {
         int dayOfDelivery = LocalDate.now().plusDays(7).getDayOfMonth(); //получаем число доставки в формате dd
         //если число месяца через 7 дней будет больше 7 , значит через 7 дней будет тот же месяц, что и сейчас > if
         if (dayOfDelivery > 7) {
-            //System.out.print(String.format("//*[text()='%s']", dayOfDelivery));
-            $x(String.format("//*[text()='%s']", dayOfDelivery)).doubleClick();
+            $x(String.format("//*[@class='calendar__row']/td[contains(text(), '%s')]", dayOfDelivery)).doubleClick();
         }
         //Если нет.
         else {
             $x("//*[@data-step='1']").click(); //Переходим на след. месяц кнопкой стрелка вправо
-            $x(String.format("//*[text()='%s']", dayOfDelivery)).doubleClick(); //ищем наше число
+            $x(String.format("//*[@class='calendar__row']/td[contains(text(), '%s')]", dayOfDelivery)).doubleClick(); //ищем наше число
         }
 
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
-        $x("//span[text()='Забронировать']").click();
-        // форматируем нужную нам дату из формата dd-mm-yyyy в формат dd.mm.yyyy
-        String europeanDatePattern = "dd.MM.yyyy";
-        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
-        String myDate = europeanDateFormatter.format(LocalDate.now().plusDays(7)).toString();
 
-        $x(String.format("//*[text()='%s']", myDate)).shouldBe(visible, Duration.ofSeconds(15));
+
+        $("[data-test-id='notification'] .notification__content").shouldBe(visible, Duration.ofSeconds(15))
+                .shouldHave(text(generateDate(7)));
 
     }
 
