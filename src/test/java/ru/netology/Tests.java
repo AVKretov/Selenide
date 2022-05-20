@@ -23,6 +23,8 @@ class Tests {
     @BeforeEach
     void setUp() {
         open("http://localhost:9999");
+        $x("//input[@placeholder='Дата встречи']").sendKeys(Keys.CONTROL + "A");
+        $x("//input[@placeholder='Дата встречи']").sendKeys(Keys.BACK_SPACE);
     }
 
 
@@ -32,15 +34,14 @@ class Tests {
         $x("//input[@placeholder='Город']").setValue("Москва");
 
         //Вставляем число через 3 дня в дату встречи
-        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(3));
+        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(5));
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
-
         // Ждем появления текста с нашей датой.
         $("[data-test-id='notification'] .notification__content").shouldBe(visible, Duration.ofSeconds(15))
-                .shouldHave(text(generateDate(3)));
+                .shouldHave(text(generateDate(5)));
 
 
     }
@@ -59,8 +60,6 @@ class Tests {
     void emptyDate() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").sendKeys(Keys.CONTROL + "A");
-        $x("//input[@placeholder='Дата встречи']").sendKeys(Keys.BACK_SPACE);
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
@@ -72,7 +71,7 @@ class Tests {
     void emptyName() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(3));
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
@@ -83,7 +82,7 @@ class Tests {
     void emptyPhone() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(3));
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
@@ -94,7 +93,7 @@ class Tests {
     void emptyAgreementCheckBox() {
 
         $x("//input[@placeholder='Город']").setValue("Москва");
-        $x("//input[@placeholder='Дата встречи']").setValue(LocalDate.now().plusDays(3).toString());
+        $x("//input[@placeholder='Дата встречи']").setValue(generateDate(3));
         $x("//input[@name='name']").setValue("Иванов Иван");
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//span[text()='Забронировать']").click();
@@ -133,10 +132,13 @@ class Tests {
         $x("//input[@name='phone']").setValue("+79112345678");
         $x("//*[@data-test-id='agreement']").click();
         $x("//span[text()='Забронировать']").click();
+        $x("//span[text()='Забронировать']").click();
+        // форматируем нужную нам дату из формата dd-mm-yyyy в формат dd.mm.yyyy
+        String europeanDatePattern = "dd.MM.yyyy";
+        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
+        String myDate = europeanDateFormatter.format(LocalDate.now().plusDays(7)).toString();
 
-
-        $("[data-test-id='notification'] .notification__content").shouldBe(visible, Duration.ofSeconds(15))
-                .shouldHave(text(generateDate(7)));
+        $x(String.format("//*[text()='%s']", myDate)).shouldBe(visible, Duration.ofSeconds(15));
 
     }
 
